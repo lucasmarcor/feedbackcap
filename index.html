@@ -5,29 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard de Feedback</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <style>
-        .chart-container { position: relative; height: 250px; width: 100%; }
-    </style>
 </head>
 <body class="bg-gray-100 p-4 md:p-8 font-sans text-gray-800 min-h-screen">
     
     <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         <!-- Panel de Carga -->
-        <div class="bg-white p-6 rounded-xl shadow-lg lg:col-span-1 h-fit sticky top-6">
-            <h2 class="text-xl font-bold mb-4 text-blue-700 border-b pb-2">Registrar Contacto</h2>
+        <div class="bg-white p-6 rounded-xl shadow-lg lg:col-span-1 h-fit sticky top-6 border-t-4 border-blue-600">
+            <h2 class="text-xl font-bold mb-6 text-blue-800 border-b pb-2">Registrar Contacto</h2>
             
-            <form id="feedbackForm" class="space-y-4">
+            <form id="feedbackForm" class="space-y-5">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de gestión</label>
-                    <input type="date" id="datePicker" class="w-full border-gray-300 rounded-md shadow-sm p-2 border focus:ring-blue-500 focus:border-blue-500" required>
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Servicio Consultado</label>
-                    <select id="service" class="w-full border-gray-300 rounded-md shadow-sm p-2 border focus:ring-blue-500 focus:border-blue-500" required>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Servicio Consultado</label>
+                    <select id="service" class="w-full border-gray-300 rounded-md shadow-sm p-2.5 border focus:ring-blue-500 focus:border-blue-500 bg-gray-50" required>
                         <option value="" disabled selected>Seleccionar...</option>
                         <option value="Ecografía">Ecografía</option>
                         <option value="Doppler">Doppler</option>
@@ -48,8 +39,8 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Motivo de no confirmación</label>
-                    <select id="reason" class="w-full border-gray-300 rounded-md shadow-sm p-2 border focus:ring-blue-500 focus:border-blue-500" required>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Motivo de no confirmación</label>
+                    <select id="reason" class="w-full border-gray-300 rounded-md shadow-sm p-2.5 border focus:ring-blue-500 focus:border-blue-500 bg-gray-50" required>
                         <option value="" disabled selected>Seleccionar...</option>
                         <option value="Aún no lo decidió">Aún no lo decidió</option>
                         <option value="Precio elevado">Precio elevado</option>
@@ -60,56 +51,56 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Comentarios Adicionales</label>
-                    <textarea id="comments" rows="3" placeholder="Detalles extra del llamado..." class="w-full border-gray-300 rounded-md shadow-sm p-2 border focus:ring-blue-500 focus:border-blue-500"></textarea>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Comentarios Adicionales</label>
+                    <textarea id="comments" rows="3" placeholder="Detalles extra del llamado..." class="w-full border-gray-300 rounded-md shadow-sm p-2.5 border focus:ring-blue-500 focus:border-blue-500 bg-gray-50"></textarea>
                 </div>
 
-                <button type="submit" class="w-full bg-blue-600 text-white font-bold py-2.5 px-4 rounded-md hover:bg-blue-700 transition duration-200 shadow">
+                <button id="submitBtn" type="submit" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-md hover:bg-blue-700 transition duration-200 shadow-md">
                     Guardar Registro
                 </button>
             </form>
         </div>
 
-        <!-- Dashboard -->
+        <!-- Dashboard Simplificado -->
         <div class="bg-white p-6 rounded-xl shadow-lg lg:col-span-2 relative">
             <button id="exportBtn" class="absolute top-6 right-6 bg-slate-800 text-white text-sm font-bold py-2 px-4 rounded-md hover:bg-slate-900 transition duration-200 shadow-md flex items-center gap-2 z-10">
                 Exportar PDF
             </button>
             
-            <div id="pdf-content" class="mt-12 lg:mt-0 p-2">
-                <h2 class="text-2xl font-bold mb-4 text-gray-800 border-b pb-2">Reporte de Gestión: <span id="displayDate" class="text-blue-600"></span></h2>
+            <div id="pdf-content" class="mt-14 lg:mt-0 p-2">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-4">
+                    Reporte de Gestión
+                </h2>
                 
-                <div class="mb-6 p-4 bg-blue-50 rounded-lg flex items-center justify-between border border-blue-100">
-                    <span class="text-lg font-semibold text-blue-900">Total contactados:</span>
-                    <span id="totalContacts" class="text-3xl font-bold text-blue-600">0</span>
+                <div class="mb-6 p-5 bg-blue-50 rounded-lg flex items-center justify-between border border-blue-200 shadow-sm">
+                    <span class="text-lg font-semibold text-blue-900">Total general de contactados:</span>
+                    <span id="totalContacts" class="text-4xl font-bold text-blue-600">0</span>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    <!-- Servicios -->
-                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 flex flex-col h-full">
-                        <h3 class="text-center font-bold text-gray-700 mb-4">Servicios Consultados</h3>
-                        <div class="chart-container mb-4 flex-grow"><canvas id="serviceChart"></canvas></div>
-                        <div class="bg-white p-3 rounded shadow-sm border mt-auto">
-                            <h4 class="text-xs font-bold text-gray-500 uppercase mb-2 border-b pb-1">Detalle</h4>
-                            <ul id="serviceList" class="space-y-1.5 max-h-48 overflow-y-auto pr-2"></ul>
-                        </div>
+                    <!-- Lista de Servicios -->
+                    <div class="bg-gray-50 p-5 rounded-lg border border-gray-200 shadow-sm">
+                        <h3 class="font-bold text-gray-800 mb-4 text-lg border-b pb-2">Servicios Consultados</h3>
+                        <ul id="serviceList" class="space-y-2">
+                            <!-- Los items se inyectan aquí -->
+                        </ul>
                     </div>
 
-                    <!-- Motivos -->
-                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 flex flex-col h-full">
-                        <h3 class="text-center font-bold text-gray-700 mb-4">Motivos de No Confirmación</h3>
-                        <div class="chart-container mb-4 flex-grow"><canvas id="reasonChart"></canvas></div>
-                        <div class="bg-white p-3 rounded shadow-sm border mt-auto">
-                            <h4 class="text-xs font-bold text-gray-500 uppercase mb-2 border-b pb-1">Detalle</h4>
-                            <ul id="reasonList" class="space-y-1.5 max-h-48 overflow-y-auto pr-2"></ul>
-                        </div>
+                    <!-- Lista de Motivos -->
+                    <div class="bg-gray-50 p-5 rounded-lg border border-gray-200 shadow-sm">
+                        <h3 class="font-bold text-gray-800 mb-4 text-lg border-b pb-2">Motivos de No Confirmación</h3>
+                        <ul id="reasonList" class="space-y-2">
+                            <!-- Los items se inyectan aquí -->
+                        </ul>
                     </div>
                 </div>
 
                 <!-- Comentarios -->
                 <div>
-                    <h3 class="text-lg font-bold text-gray-800 mb-3 border-b pb-2">Comentarios Adicionales</h3>
-                    <div id="commentsList" class="space-y-3 max-h-72 overflow-y-auto bg-gray-50 p-4 rounded-lg border border-gray-200"></div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Comentarios Adicionales</h3>
+                    <div id="commentsList" class="space-y-4 bg-gray-50 p-5 rounded-lg border border-gray-200 shadow-inner min-h-[100px]">
+                        <!-- Los comentarios se inyectan aquí -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -118,9 +109,8 @@
     <!-- Integración Modular de Firebase -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, query, onSnapshot, orderBy } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // ⚠️ PEGA AQUÍ TU CONFIGURACIÓN DE FIREBASE ⚠️
         const firebaseConfig = {
             apiKey: "AIzaSyAI_LhLiGAMgWfOw9Gs8jXJXtrLTfbMesM",
             authDomain: "feedbackcap-dc24d.firebaseapp.com",
@@ -133,152 +123,127 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        let serviceChartInstance = null;
-        let reasonChartInstance = null;
-        let currentUnsubscribe = null;
+        // Referencias al DOM
+        const serviceListEl = document.getElementById('serviceList');
+        const reasonListEl = document.getElementById('reasonList');
+        const commentsListEl = document.getElementById('commentsList');
+        const totalContactsEl = document.getElementById('totalContacts');
+        const submitBtn = document.getElementById('submitBtn');
+        const feedbackForm = document.getElementById('feedbackForm');
 
-        const datePicker = document.getElementById('datePicker');
-        const displayDate = document.getElementById('displayDate');
-        datePicker.value = new Date().toISOString().split('T')[0];
-
-        const chartColors = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'];
-
-        function loadData() {
-            const date = datePicker.value;
-            const [year, month, day] = date.split('-');
-            displayDate.textContent = `${day}/${month}/${year}`;
-
-            if (currentUnsubscribe) currentUnsubscribe();
-
-            const q = query(collection(db, "feedbacks"), where("date", "==", date));
-            
-            // onSnapshot mantiene los gráficos actualizados en vivo
-            currentUnsubscribe = onSnapshot(q, (querySnapshot) => {
-                const data = [];
-                querySnapshot.forEach((doc) => data.push(doc.data()));
-                updateDashboard(data);
-            });
-        }
+        // Escuchar datos en tiempo real 
+        const q = query(collection(db, "feedbacks"), orderBy("timestamp", "desc"));
+        
+        onSnapshot(q, (querySnapshot) => {
+            const data = [];
+            querySnapshot.forEach((doc) => data.push(doc.data()));
+            updateDashboard(data);
+        }, (error) => {
+            console.error("Error al leer datos:", error);
+            serviceListEl.innerHTML = `<li class="text-red-500 font-bold p-2 text-center">Revisa tu conexión a internet o los permisos de lectura de Firebase.</li>`;
+        });
 
         function updateDashboard(data) {
-            document.getElementById('totalContacts').textContent = data.length;
+            totalContactsEl.textContent = data.length;
+            
             const serviceCounts = {};
             const reasonCounts = {};
             const comments = [];
 
+            // Procesar conteos
             data.forEach(item => {
                 serviceCounts[item.service] = (serviceCounts[item.service] || 0) + 1;
                 reasonCounts[item.reason] = (reasonCounts[item.reason] || 0) + 1;
+                
                 if (item.comment && item.comment.trim() !== '') {
                     comments.push({ s: item.service, r: item.reason, c: item.comment });
                 }
             });
 
-            renderChartAndList('serviceChart', document.getElementById('serviceList'), serviceCounts);
-            renderChartAndList('reasonChart', document.getElementById('reasonList'), reasonCounts);
+            renderList(serviceListEl, serviceCounts);
+            renderList(reasonListEl, reasonCounts);
             renderComments(comments);
         }
 
-        function renderChartAndList(canvasId, listEl, countsObj) {
-            const labels = Object.keys(countsObj);
-            const dataValues = Object.values(countsObj);
-            
-            if (canvasId === 'serviceChart' && serviceChartInstance) serviceChartInstance.destroy();
-            if (canvasId === 'reasonChart' && reasonChartInstance) reasonChartInstance.destroy();
-
-            listEl.innerHTML = '';
+        function renderList(listElement, countsObj) {
+            listElement.innerHTML = '';
+            // Ordenar de mayor a menor
             const sortedCounts = Object.entries(countsObj).sort((a, b) => b[1] - a[1]);
             
             if (sortedCounts.length === 0) {
-                listEl.innerHTML = '<li class="text-sm text-gray-500 italic py-2 text-center">Sin datos registrados</li>';
-            } else {
-                sortedCounts.forEach(([name, count]) => {
-                    listEl.innerHTML += `<li class="flex justify-between items-center text-sm text-gray-700 py-1.5 border-b border-gray-100 last:border-0"><span class="font-medium pr-2">${name}</span> <span class="bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded-full text-xs">${count}</span></li>`;
-                });
+                listElement.innerHTML = '<li class="text-sm text-gray-500 italic py-2 text-center">Aún no hay datos cargados</li>';
+                return;
             }
 
-            const ctx = document.getElementById(canvasId).getContext('2d');
-            const newChart = new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: labels.length ? labels : ['Sin datos'],
-                    datasets: [{
-                        data: dataValues.length ? dataValues : [1],
-                        backgroundColor: dataValues.length ? chartColors.slice(0, labels.length) : ['#e5e7eb'],
-                        borderWidth: 1, borderColor: '#ffffff'
-                    }]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { 
-                        legend: { display: false },
-                        tooltip: { enabled: dataValues.length > 0 }
-                    }
-                }
+            sortedCounts.forEach(([name, count]) => {
+                listElement.innerHTML += `
+                    <li class="flex justify-between items-center bg-white p-3 rounded shadow-sm border border-gray-100">
+                        <span class="font-medium text-gray-700">${name}</span> 
+                        <span class="bg-blue-600 text-white font-bold px-3 py-1 rounded-full text-sm">${count}</span>
+                    </li>`;
             });
-
-            if (canvasId === 'serviceChart') serviceChartInstance = newChart;
-            if (canvasId === 'reasonChart') reasonChartInstance = newChart;
         }
 
         function renderComments(comments) {
-            const commentsListEl = document.getElementById('commentsList');
             commentsListEl.innerHTML = comments.length === 0 
-                ? '<p class="text-sm text-gray-500 italic">No hay comentarios.</p>' 
+                ? '<p class="text-sm text-gray-500 italic text-center py-4">No hay comentarios registrados.</p>' 
                 : '';
             
             comments.forEach(item => {
                 commentsListEl.innerHTML += `
                     <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                        <p class="text-gray-800 mb-2 italic">"${item.c}"</p>
-                        <div class="flex gap-2 flex-wrap">
-                            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded"><strong>Serv:</strong> ${item.s}</span>
-                            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded"><strong>Mot:</strong> ${item.r}</span>
+                        <p class="text-gray-800 mb-3 text-sm md:text-base">"${item.c}"</p>
+                        <div class="flex gap-2 flex-wrap mt-2 pt-2 border-t border-gray-100">
+                            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded font-medium">S: ${item.s}</span>
+                            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded font-medium">M: ${item.r}</span>
                         </div>
                     </div>`;
             });
         }
 
-        datePicker.addEventListener('change', loadData);
-
-        document.getElementById('feedbackForm').addEventListener('submit', async (e) => {
+        // Guardar nuevo registro optimizado para velocidad
+        feedbackForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            const date = datePicker.value;
+            
+            submitBtn.innerText = "Guardando...";
+            submitBtn.disabled = true;
+
             const service = document.getElementById('service').value;
             const reason = document.getElementById('reason').value;
             const comment = document.getElementById('comments').value;
 
-            try {
-                await addDoc(collection(db, "feedbacks"), { date, service, reason, comment, timestamp: new Date() });
-                document.getElementById('service').value = '';
-                document.getElementById('reason').value = '';
-                document.getElementById('comments').value = '';
-            } catch (error) {
-                console.error("Error guardando el registro: ", error);
-                alert("Hubo un error al guardar. Revisa la conexión a Firebase.");
-            }
+            // Enviar a la nube en segundo plano (sin 'await' para evitar bloqueos)
+            addDoc(collection(db, "feedbacks"), { 
+                service: service, 
+                reason: reason, 
+                comment: comment, 
+                timestamp: Date.now() 
+            }).catch((error) => {
+                console.error("Firebase sincronizará cuando recupere conexión: ", error);
+            });
+            
+            // Liberar la interfaz casi de inmediato para el siguiente llamado
+            setTimeout(() => {
+                feedbackForm.reset(); // Vuelve todos los campos a su estado original
+                submitBtn.innerText = "Guardar Registro";
+                submitBtn.disabled = false;
+            }, 300); // 300ms permite un feedback visual cómodo
         });
 
+        // Exportar PDF
         document.getElementById('exportBtn').addEventListener('click', () => {
             const element = document.getElementById('pdf-content');
-            document.getElementById('serviceList').classList.remove('max-h-48', 'overflow-y-auto');
-            document.getElementById('reasonList').classList.remove('max-h-48', 'overflow-y-auto');
-            document.getElementById('commentsList').classList.remove('max-h-72', 'overflow-y-auto');
-
-            html2pdf().set({
+            
+            const opt = {
                 margin: 10,
-                filename: `Feedback_${displayDate.textContent.replace(/\//g, '-')}.pdf`,
+                filename: `Reporte_Feedback_General.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            }).from(element).save().then(() => {
-                document.getElementById('serviceList').classList.add('max-h-48', 'overflow-y-auto');
-                document.getElementById('reasonList').classList.add('max-h-48', 'overflow-y-auto');
-                document.getElementById('commentsList').classList.add('max-h-72', 'overflow-y-auto');
-            });
-        });
+            };
 
-        loadData();
+            html2pdf().set(opt).from(element).save();
+        });
     </script>
 </body>
 </html>
