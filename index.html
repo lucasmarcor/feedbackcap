@@ -11,7 +11,7 @@
     
     <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        <!-- Panel de Carga -->
+        <!-- Panel de Carga Súper Simplificado -->
         <div class="bg-white p-6 rounded-xl shadow-lg lg:col-span-1 h-fit sticky top-6 border-t-4 border-blue-600">
             <h2 class="text-xl font-bold mb-6 text-blue-800 border-b pb-2">Registrar Contacto</h2>
             
@@ -61,7 +61,7 @@
             </form>
         </div>
 
-        <!-- Dashboard Simplificado -->
+        <!-- Dashboard Simplificado (Solo Listas) -->
         <div class="bg-white p-6 rounded-xl shadow-lg lg:col-span-2 relative">
             <button id="exportBtn" class="absolute top-6 right-6 bg-slate-800 text-white text-sm font-bold py-2 px-4 rounded-md hover:bg-slate-900 transition duration-200 shadow-md flex items-center gap-2 z-10">
                 Exportar PDF
@@ -109,7 +109,8 @@
     <!-- Integración Modular de Firebase -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, query, onSnapshot, orderBy } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        // Se quitó orderBy de la importación ya que el ordenamiento se hará localmente
+        import { getFirestore, collection, addDoc, query, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAI_LhLiGAMgWfOw9Gs8jXJXtrLTfbMesM",
@@ -131,12 +132,21 @@
         const submitBtn = document.getElementById('submitBtn');
         const feedbackForm = document.getElementById('feedbackForm');
 
-        // Escuchar datos en tiempo real 
-        const q = query(collection(db, "feedbacks"), orderBy("timestamp", "desc"));
+        // Escuchar datos en tiempo real de toda la colección (SIN filtros que excluyan registros viejos)
+        const q = query(collection(db, "feedbacks"));
         
         onSnapshot(q, (querySnapshot) => {
             const data = [];
             querySnapshot.forEach((doc) => data.push(doc.data()));
+            
+            // Ordenar localmente para asegurar que los comentarios nuevos queden arriba 
+            // Esto evita el bug de Firestore al mezclar registros con y sin fecha
+            data.sort((a, b) => {
+                const timeA = typeof a.timestamp === 'number' ? a.timestamp : (a.timestamp?.toMillis ? a.timestamp.toMillis() : 0);
+                const timeB = typeof b.timestamp === 'number' ? b.timestamp : (b.timestamp?.toMillis ? b.timestamp.toMillis() : 0);
+                return timeB - timeA;
+            });
+
             updateDashboard(data);
         }, (error) => {
             console.error("Error al leer datos:", error);
